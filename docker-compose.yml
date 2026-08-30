@@ -1,0 +1,70 @@
+# Deploy di VPS:
+#   1) Arahkan DNS domain Anda ke IP VPS.
+#   2) Salin .env.example -> .env, isi DOMAIN dan CERTBOT_EMAIL.
+#   3) Bangun image aplikasi:            docker compose build
+#   4) Terbitkan sertifikat pertama:     ./init-letsencrypt.sh
+#   5) Jalankan semuanya:                docker compose up -d
+#
+# Sensor (DeviceOrientation) & Geolocation butuh HTTPS — dipenuhi oleh Nginx.
+# certbot menerbitkan & memperpanjang sertifikat Let's Encrypt otomatis.
+
+services:
+  web:
+    build:
+      context: .
+    image: ilmu-falak:latest
+    container_name: ilmu-falak
+    restart: unless-stopped
+    # Hanya diekspos ke jaringan internal Compose; akses publik lewat Nginx.
+    expose:
+      - "3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  nginx:
+    image: nginx:alpine
+    container_name: ilmu-falak-nginx
+    restart: unless-stopped
+    depends_on:
+      web:
+        condition: service_healthy
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+      # Hanya substitusi ${DOMAIN}; variabel runtime nginx ($host dll) dibiarkan utuh.
+      - NGINX_ENVSUBST_FILTER=DOMAIN
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - certbot-etc:/etc/letsencrypt:ro
+      - certbot-webroot:/var/www/certbot
+    # Muat ulang tiap 6 jam agar sertifikat yang diperbarui certbot ikut terpakai.
+    command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & exec nginx -g 'daemon off;'"
+
+  certbot:
+    image: certbot/certbot
+    container_name: ilmu-falak-certbot
+    restart: unless-stopped
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+    # Coba perpanjang tiap 12 jam (hanya diperbarui bila mendekati kedaluwarsa).
+    entrypoint: /bin/sh -c "trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot; sleep 12h & wait $${!}; done"
+
+volumes:
+  certbot-etc:
+  certbot-webroot:
