@@ -9,7 +9,7 @@ import { useGeolocation } from "@/hooks/useGeolocation";
 import { useDeviceOrientation } from "@/hooks/useDeviceOrientation";
 import { qiblaAzimuth, haversineDistance } from "@/lib/qibla";
 import { magneticDeclination } from "@/lib/declination";
-import { compassRotation } from "@/lib/compass";
+import { compassRotation, turnInstruction } from "@/lib/compass";
 import { loadStoredLocation, saveStoredLocation } from "@/lib/storage";
 
 export function QiblaClient() {
@@ -54,6 +54,17 @@ export function QiblaClient() {
   // Sensor ada tetapi tidak mengacu utara (relatif) → jangan tampilkan kompas yang menyesatkan.
   const relativeOnly = orientation.heading !== null && !orientation.absolute;
 
+  const hint = rotation !== null ? turnInstruction(rotation) : null;
+  const wasAligned = useRef(false);
+
+  // Getaran singkat sekali saat perangkat baru saja tepat menghadap kiblat.
+  useEffect(() => {
+    if (hint?.aligned && !wasAligned.current) {
+      navigator.vibrate?.(60);
+    }
+    wasAligned.current = hint?.aligned ?? false;
+  }, [hint?.aligned]);
+
   function handleSelect(lat: number, lng: number, nextLabel: string) {
     geo.setManual(lat, lng);
     setLabel(nextLabel);
@@ -81,7 +92,26 @@ export function QiblaClient() {
     <div className="flex w-full max-w-md flex-col gap-8">
       {result ? (
         <div className="flex flex-col items-center gap-6">
-          <Compass qiblaAzimuth={result.azimuth} rotation={rotation} />
+          <Compass
+            qiblaAzimuth={result.azimuth}
+            rotation={rotation}
+            aligned={hint?.aligned ?? false}
+          />
+
+          {hint && (
+            <p
+              aria-live="polite"
+              className={
+                hint.aligned
+                  ? "w-full rounded-lg bg-emerald-600 px-4 py-2 text-center text-sm font-semibold text-white"
+                  : "w-full rounded-lg bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+              }
+            >
+              {hint.aligned
+                ? "\u2713 Tepat menghadap kiblat"
+                : `Putar ke ${hint.direction === "right" ? "kanan" : "kiri"} ${hint.degrees}\u00b0`}
+            </p>
+          )}
 
           <dl className="grid w-full grid-cols-2 gap-3 text-sm">
             <div className="rounded-lg bg-slate-100 p-3 dark:bg-slate-800">

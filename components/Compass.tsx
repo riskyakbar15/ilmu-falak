@@ -5,6 +5,8 @@ interface CompassProps {
   qiblaAzimuth: number;
   /** Sudut putar panah relatif layar; null bila sensor kompas tak aktif. */
   rotation: number | null;
+  /** True bila perangkat sudah menghadap kiblat (kompas real-time aktif). */
+  aligned?: boolean;
 }
 
 const CARDINALS = [
@@ -14,9 +16,14 @@ const CARDINALS = [
   { label: "B", angle: 270 },
 ];
 
-export function Compass({ qiblaAzimuth, rotation }: CompassProps) {
+export function Compass({
+  qiblaAzimuth,
+  rotation,
+  aligned = false,
+}: CompassProps) {
   // Tanpa sensor: dial statis, panah menunjuk azimut dari Utara (atas = Utara).
   const needleAngle = rotation ?? qiblaAzimuth;
+  const realtime = rotation !== null;
   const bearing = formatBearing(qiblaAzimuth);
 
   return (
@@ -31,8 +38,12 @@ export function Compass({ qiblaAzimuth, rotation }: CompassProps) {
           cx="100"
           cy="100"
           r="94"
-          className="fill-white stroke-emerald-200 dark:fill-slate-900 dark:stroke-slate-700"
           strokeWidth="2"
+          className={
+            aligned
+              ? "fill-white stroke-emerald-500 dark:fill-slate-900"
+              : "fill-white stroke-emerald-200 dark:fill-slate-900 dark:stroke-slate-700"
+          }
         />
         <circle
           cx="100"
@@ -41,6 +52,29 @@ export function Compass({ qiblaAzimuth, rotation }: CompassProps) {
           className="fill-none stroke-emerald-100 dark:stroke-slate-800"
           strokeWidth="1"
         />
+
+        {/* Penanda target tetap di atas: sejajarkan panah ke sini saat pakai kompas. */}
+        {realtime && (
+          <g>
+            <polygon
+              points="100,6 93,20 107,20"
+              className={aligned ? "fill-emerald-500" : "fill-amber-500"}
+            />
+            <line
+              x1="100"
+              y1="20"
+              x2="100"
+              y2="100"
+              strokeWidth="1"
+              strokeDasharray="3 4"
+              className={
+                aligned
+                  ? "stroke-emerald-400"
+                  : "stroke-slate-300 dark:stroke-slate-600"
+              }
+            />
+          </g>
+        )}
 
         {CARDINALS.map(({ label, angle }) => {
           const rad = (angle * Math.PI) / 180;
@@ -65,7 +99,7 @@ export function Compass({ qiblaAzimuth, rotation }: CompassProps) {
         >
           <polygon
             points="100,22 108,104 100,96 92,104"
-            className="fill-emerald-600"
+            className={aligned ? "fill-emerald-500" : "fill-emerald-600"}
           />
           <polygon
             points="100,178 108,96 100,104 92,96"

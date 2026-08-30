@@ -16,3 +16,32 @@ export function compassRotation(
   const trueHeading = heading + declination;
   return normalizeDegrees(qiblaAzimuth - trueHeading);
 }
+
+export interface TurnInstruction {
+  /** True bila perangkat sudah menghadap kiblat dalam toleransi. */
+  aligned: boolean;
+  /** Arah putar perangkat agar lurus ke kiblat. */
+  direction: "left" | "right" | "none";
+  /** Besar sudut yang perlu diputar (derajat, dibulatkan). */
+  degrees: number;
+}
+
+/**
+ * Petunjuk belok dari sudut putar panah kompas. `rotation` adalah keluaran
+ * `compassRotation` (posisi panah relatif atas layar). Positif = kiblat di kanan.
+ */
+export function turnInstruction(
+  rotation: number,
+  toleranceDeg = 5,
+): TurnInstruction {
+  const signed = rotation > 180 ? rotation - 360 : rotation;
+  const magnitude = Math.abs(signed);
+  if (magnitude <= toleranceDeg) {
+    return { aligned: true, direction: "none", degrees: 0 };
+  }
+  return {
+    aligned: false,
+    direction: signed > 0 ? "right" : "left",
+    degrees: Math.round(magnitude),
+  };
+}

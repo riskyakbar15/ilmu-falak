@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { compassRotation } from "./compass";
+import { compassRotation, turnInstruction } from "./compass";
 import { normalizeDegrees } from "./qibla";
 
 // compassRotation menghitung sudut putar panah kompas relatif terhadap layar.
@@ -26,5 +26,32 @@ describe("compassRotation", () => {
       expect(r).toBeGreaterThanOrEqual(0);
       expect(r).toBeLessThan(360);
     }
+  });
+});
+
+describe("turnInstruction", () => {
+  it("dianggap tepat saat dalam toleransi", () => {
+    expect(turnInstruction(0).aligned).toBe(true);
+    expect(turnInstruction(3).aligned).toBe(true);
+    expect(turnInstruction(357).aligned).toBe(true);
+  });
+
+  it("menyuruh putar ke kanan bila kiblat searah jarum jam", () => {
+    const t = turnInstruction(30);
+    expect(t.aligned).toBe(false);
+    expect(t.direction).toBe("right");
+    expect(t.degrees).toBe(30);
+  });
+
+  it("menyuruh putar ke kiri bila kiblat berlawanan jarum jam", () => {
+    const t = turnInstruction(330);
+    expect(t.direction).toBe("left");
+    expect(t.degrees).toBe(30);
+  });
+
+  it("memilih putaran terpendek untuk sudut > 180", () => {
+    const t = turnInstruction(200);
+    expect(t.direction).toBe("left");
+    expect(t.degrees).toBe(160);
   });
 });
