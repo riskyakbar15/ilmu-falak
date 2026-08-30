@@ -52,8 +52,9 @@ services:
       - ./nginx/templates:/etc/nginx/templates:ro
       - certbot-etc:/etc/letsencrypt:ro
       - certbot-webroot:/var/www/certbot
-    # Muat ulang tiap 6 jam agar sertifikat yang diperbarui certbot ikut terpakai.
-    command: /bin/sh -c "while :; do sleep 6h & wait $${!}; nginx -s reload; done & exec nginx -g 'daemon off;'"
+    # Render template dulu (skrip bawaan hanya jalan bila arg pertama "nginx"),
+    # lalu muat ulang tiap 6 jam agar sertifikat yang diperbarui certbot ikut terpakai.
+    command: /bin/sh -c "/docker-entrypoint.d/20-envsubst-on-templates.sh; (while :; do sleep 6h & wait $${!}; nginx -s reload; done &) ; exec nginx -g 'daemon off;'"
 
   certbot:
     image: certbot/certbot
