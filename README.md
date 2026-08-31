@@ -2,7 +2,7 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-48%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-63%20passing-brightgreen)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -46,6 +46,13 @@ sekaligus bahan belajar ilmu falak.
 - **Rashdul Qibla** — hitung mundur ke momen Matahari tepat di atas Ka'bah, saat
   bayangan benda tegak menunjuk lurus menjauhi kiblat (verifikasi tanpa alat).
 
+### Jadwal salat
+
+- **Jadwal salat harian** (Subuh, Terbit, Dzuhur, Ashar, Magrib, Isya) dihitung dari
+  posisi Matahari, dengan pilihan **metode** (Kemenag RI, MWL, ISNA, Umm al-Qura,
+  Mesir), **madzhab Ashar** (Standar/Hanafi), dan **ihtiyat per waktu** (menit pengaman
+  tiap salat). Menyorot salat berikutnya.
+
 ### Lokasi & PWA
 
 - **GPS otomatis** atau **fallback manual** (cari kota offline / input koordinat),
@@ -84,6 +91,18 @@ Azimut, ketinggian, dan deklinasi Matahari dihitung dengan **algoritma NOAA** da
 dan waktu. Ini menjadi dasar metode bayangan dan pencarian momen **Rashdul Qibla**
 (saat sub-titik Matahari melewati Ka'bah, ± dua kali setahun).
 
+### Perhitungan jadwal salat
+
+Waktu salat dihitung dari sudut ketinggian Matahari untuk tanggal & lokasi (berbagi
+perhitungan `solarCoords` dengan metode di atas):
+
+- **Subuh & Isya** — sudut depresi Matahari sesuai metode (mis. Kemenag RI 20°/18°;
+  Umm al-Qura memakai interval 90 menit setelah Magrib untuk Isya).
+- **Ashar** — dari faktor bayangan (Standar/Syafi'i = 1, Hanafi = 2).
+- **Ihtiyat** — menit pengaman opsional **per waktu** (tiap salat bisa berbeda; default
+  gaya Kemenag +2 menit, Terbit −2 menit), berguna agar cocok dengan jadwal resmi. Waktu
+  ditampilkan menurut zona waktu perangkat.
+
 Keputusan desain dirangkum di [`docs/plan.md`](docs/plan.md) dan ADR di
 [`docs/adr/`](docs/adr/); glosarium istilah di [`docs/CONTEXT.md`](docs/CONTEXT.md).
 
@@ -94,9 +113,9 @@ Aplikasi murni klien: UI memanggil hooks sensor dan fungsi murni, tanpa backend.
 ```mermaid
 flowchart TD
     subgraph Peramban["Peramban (murni klien)"]
-        UI["UI React<br/>Compass · SunGuide · RashdulQibla · LocationInput"]
+        UI["UI React<br/>Compass · SunGuide · RashdulQibla · PrayerTimes · LocationInput"]
         Hooks["Hooks sensor<br/>useGeolocation · useDeviceOrientation"]
-        Lib["Fungsi murni (lib/)<br/>qibla · declination · compass · solar · format"]
+        Lib["Fungsi murni (lib/)<br/>qibla · declination · compass · solar · prayer · format"]
         Data[("Data offline<br/>cities · WMM 2025")]
         SW["Service Worker<br/>(offline PWA)"]
     end
@@ -111,9 +130,9 @@ flowchart TD
 
 ```Struktur
 app/          Halaman, layout, manifest, service worker (Serwist)
-components/    Compass, LocationInput, MethodPanel, SunGuide, RashdulQibla, QiblaClient
+components/    Compass, LocationInput, MethodPanel, SunGuide, RashdulQibla, PrayerTimes, QiblaClient
 hooks/         useGeolocation, useDeviceOrientation
-lib/           Fungsi murni: qibla, declination, compass, format, solar, storage, constants
+lib/           Fungsi murni: qibla, declination, compass, format, solar, prayer, storage, constants
 data/          cities.ts (dataset kota offline)
 public/        Ikon PWA (icon.svg + PNG) dan aset statis
 docs/          plan.md, CONTEXT.md (glosarium), adr/
@@ -121,7 +140,7 @@ docs/          plan.md, CONTEXT.md (glosarium), adr/
 
 - **Logika inti = fungsi murni** di [`lib/`](lib/) (mudah diuji, TDD): `qiblaAzimuth`,
   `haversineDistance`, `magneticDeclination`, `compassRotation`, `formatBearing`,
-  `solarPosition`, `nextRashdulQibla`.
+  `solarPosition`, `nextRashdulQibla`, `prayerTimes`.
 - **Sensor via hooks** memisahkan efek/izin dari logika perhitungan.
 - **UI** mengonsumsi hooks + fungsi murni; `QiblaClient` menjadi penghubungnya.
 
@@ -189,10 +208,11 @@ sertifikat otomatis; Nginx memuat ulang berkala tanpa downtime.
 
 ## Pengujian
 
-48 test (Vitest + Testing Library) mencakup:
+63 test (Vitest + Testing Library) mencakup:
 
 - **Fungsi murni** `lib/` — azimut kiblat divalidasi terhadap nilai terpublikasi
-  (Jakarta, New York, London, Istanbul) dan posisi Matahari terhadap momen Rashdul Qibla.
+  (Jakarta, New York, London, Istanbul), posisi Matahari terhadap momen Rashdul Qibla,
+  serta jadwal salat (urutan, simetri terbit/terbenam, metode & madzhab, ihtiyat).
 - **Hooks** — `useGeolocation` (izin, fallback, pembersihan watcher) dan
   `useDeviceOrientation` (heading absolut vs relatif).
 - **Komponen** — `LocationInput` (pencarian kota, validasi koordinat) dan `Compass`.
@@ -203,9 +223,9 @@ npm test
 
 ## Batasan & Rencana Lanjutan
 
-MVP fokus pada arah kiblat. Rencana lanjutan: model ellipsoid (Vincenty), multi-bahasa
-(ID/EN/AR), overlay AR kamera, aplikasi native, serta modul ilmu falak lain (jadwal salat,
-kalender hijriah, rukyat hilal). Lihat [`docs/plan.md`](docs/plan.md).
+MVP fokus pada arah kiblat, kini juga mencakup jadwal salat. Rencana lanjutan: model
+ellipsoid (Vincenty), multi-bahasa (ID/EN/AR), overlay AR kamera, aplikasi native, serta
+modul ilmu falak lain (kalender hijriah, rukyat hilal). Lihat [`docs/plan.md`](docs/plan.md).
 
 Akurasi kompas bergantung pada sensor dan kalibrasi perangkat — jauhkan dari benda
 logam/magnet dan kalibrasi dengan gerakan angka 8. Bila sensor tak andal, gunakan
