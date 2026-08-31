@@ -1,4 +1,4 @@
-# Arah Kiblat — Ilmu Falak
+# Arah Kiblat - Ilmu Falak
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
