@@ -2,6 +2,13 @@ import type { NextConfig } from "next";
 import withSerwistInit from "@serwist/next";
 
 // Aplikasi murni klien tanpa sumber daya eksternal; izinkan sensor hanya untuk origin sendiri.
+const isDev = process.env.NODE_ENV === "development";
+
+// React/Next memakai eval() untuk debugging saat dev; produksi tetap tanpa 'unsafe-eval'.
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
+
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
@@ -21,7 +28,7 @@ const securityHeaders = [
       "default-src 'self'",
       "img-src 'self' data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline'",
+      scriptSrc,
       "font-src 'self' data:",
       "connect-src 'self'",
       "worker-src 'self'",
@@ -43,12 +50,11 @@ const nextConfig: NextConfig = {
 
 // Serwist menyuntikkan konfigurasi webpack; lewati saat dev agar Turbopack tetap dipakai.
 // Service worker dihasilkan pada build produksi (`next build --webpack`).
-const config: NextConfig =
-  process.env.NODE_ENV === "development"
-    ? nextConfig
-    : withSerwistInit({
-        swSrc: "app/sw.ts",
-        swDest: "public/sw.js",
-      })(nextConfig);
+const config: NextConfig = isDev
+  ? nextConfig
+  : withSerwistInit({
+      swSrc: "app/sw.ts",
+      swDest: "public/sw.js",
+    })(nextConfig);
 
 export default config;
