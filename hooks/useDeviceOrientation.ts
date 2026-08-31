@@ -1,6 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  accuracyLevel,
+  jitterToAccuracy,
+  headingJitter,
+  type AccuracyLevel,
+} from "@/lib/compass";
 
 export type OrientationPermission =
   | "unknown"
@@ -13,6 +19,10 @@ export interface UseDeviceOrientation {
   heading: number | null;
   /** True bila heading berasal dari sensor absolut (mengacu utara), bukan relatif. */
   absolute: boolean;
+  /** Ketidakpastian kompas dalam derajat (webkitCompassAccuracy, iOS); null bila tak ada. */
+  accuracy: number | null;
+  /** Level akurasi kompas: nilai resmi iOS bila ada, jika tidak heuristik jitter (Android). */
+  accuracyLevel: AccuracyLevel;
   permission: OrientationPermission;
   /** Minta izin sensor (dibutuhkan iOS, harus dipicu gestur pengguna). */
   requestPermission: () => Promise<void>;
@@ -20,6 +30,7 @@ export interface UseDeviceOrientation {
 
 interface WebkitDeviceOrientationEvent extends DeviceOrientationEvent {
   webkitCompassHeading?: number;
+  webkitCompassAccuracy?: number;
 }
 
 interface IOSDeviceOrientationEventStatic {
@@ -57,40 +68,63 @@ function tiltCompensatedHeading(
 export function useDeviceOrientation(): UseDeviceOrientation {
   const [heading, setHeading] = useState<number | null>(null);
   const [absolute, setAbsolute] = useState(false);
+  const [accuracy, setAccuracy] = useState<number | null>(null);
+  const [level, setLevel] = useState<AccuracyLevel>("unknown");
   const [permission, setPermission] =
     useState<OrientationPermission>("unknown");
   const listening = useRef(false);
   const lastEvent = useRef<DeviceOrientationEvent | null>(null);
   const absoluteSeen = useRef(false);
+  const samples = useRef<number[]>([]);
 
   const handleEvent = useCallback((event: DeviceOrientationEvent) => {
     const screenAngle = getScreenAngle();
+    const webkit = event as WebkitDeviceOrientationEvent;
 
-    const webkitHeading = (event as WebkitDeviceOrientationEvent)
-      .webkitCompassHeading;
+    let newHeading: number | null = null;
+    let isAbsolute = false;
+    let rawAccuracy: number | null = null;
+
+    const webkitHeading = webkit.webkitCompassHeading;
     if (typeof webkitHeading === "number" && !Number.isNaN(webkitHeading)) {
+      newHeading = normalize(webkitHeading + screenAngle);
+      isAbsolute = true;
       absoluteSeen.current = true;
-      lastEvent.current = event;
-      setHeading(normalize(webkitHeading + screenAngle));
-      setAbsolute(true);
+      if (typeof webkit.webkitCompassAccuracy === "number") {
+        rawAccuracy = webkit.webkitCompassAccuracy;
+      }
+    } else if (event.alpha !== null && event.alpha !== undefined) {
+      const abs =
+        event.type === "deviceorientationabsolute" || event.absolute === true;
+      // Setelah sensor absolut tersedia, abaikan event relatif agar heading tak salah.
+      if (!abs && absoluteSeen.current) return;
+      if (abs) absoluteSeen.current = true;
+      const base =
+        typeof event.beta === "number" && typeof event.gamma === "number"
+          ? tiltCompensatedHeading(event.alpha, event.beta, event.gamma)
+          : 360 - event.alpha;
+      newHeading = normalize(base + screenAngle);
+      isAbsolute = abs;
+    } else {
       return;
     }
 
-    if (event.alpha !== null && event.alpha !== undefined) {
-      const isAbsolute =
-        event.type === "deviceorientationabsolute" || event.absolute === true;
-      // Setelah sensor absolut tersedia, abaikan event relatif agar heading tak salah.
-      if (!isAbsolute && absoluteSeen.current) return;
-      if (isAbsolute) absoluteSeen.current = true;
+    lastEvent.current = event;
 
-      lastEvent.current = event;
-      const base =
-        event.beta !== null && event.gamma !== null
-          ? tiltCompensatedHeading(event.alpha, event.beta, event.gamma)
-          : 360 - event.alpha;
-      setHeading(normalize(base + screenAngle));
-      setAbsolute(isAbsolute);
-    }
+    // Kumpulkan sampel untuk heuristik jitter (Android tanpa nilai akurasi resmi).
+    const buffer = samples.current;
+    buffer.push(newHeading);
+    if (buffer.length > 24) buffer.shift();
+
+    const nextLevel =
+      rawAccuracy !== null
+        ? accuracyLevel(rawAccuracy)
+        : jitterToAccuracy(headingJitter(buffer));
+
+    setHeading(newHeading);
+    setAbsolute(isAbsolute);
+    if (rawAccuracy !== null) setAccuracy(rawAccuracy);
+    setLevel((prev) => (prev === nextLevel ? prev : nextLevel));
   }, []);
 
   // Layar bisa diputar tanpa perangkat bergerak; hitung ulang dari event terakhir.
@@ -144,5 +178,12 @@ export function useDeviceOrientation(): UseDeviceOrientation {
     };
   }, [handleEvent, handleScreenChange]);
 
-  return { heading, absolute, permission, requestPermission };
+  return {
+    heading,
+    absolute,
+    accuracy,
+    accuracyLevel: level,
+    permission,
+    requestPermission,
+  };
 }

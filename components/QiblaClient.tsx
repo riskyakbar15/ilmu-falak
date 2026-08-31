@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Compass } from "@/components/Compass";
+import { CompassAccuracy } from "@/components/CompassAccuracy";
 import { SunGuide } from "@/components/SunGuide";
 import { RashdulQibla } from "@/components/RashdulQibla";
 import { PrayerTimes } from "@/components/PrayerTimes";
@@ -112,6 +113,10 @@ export function QiblaClient() {
                 ? "\u2713 Tepat menghadap kiblat"
                 : `Putar ke ${hint.direction === "right" ? "kanan" : "kiri"} ${hint.degrees}\u00b0`}
             </p>
+          )}
+
+          {rotation !== null && (
+            <CompassAccuracy level={orientation.accuracyLevel} />
           )}
 
           <dl className="grid w-full grid-cols-2 gap-3 text-sm">
