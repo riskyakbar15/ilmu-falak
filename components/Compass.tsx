@@ -16,6 +16,9 @@ const CARDINALS = [
   { label: "B", angle: 270 },
 ];
 
+// Tik-tik piringan tiap 15°, lebih panjang pada kelipatan 45° (gaya astrolab).
+const TICKS = Array.from({ length: 24 }, (_, i) => i * 15);
+
 export function Compass({
   qiblaAzimuth,
   rotation,
@@ -27,7 +30,7 @@ export function Compass({
   const bearing = formatBearing(qiblaAzimuth);
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-5">
       <svg
         viewBox="0 0 200 200"
         className="h-64 w-64 sm:h-72 sm:w-72"
@@ -37,28 +40,46 @@ export function Compass({
         <circle
           cx="100"
           cy="100"
-          r="94"
-          strokeWidth="2"
+          r="95"
+          strokeWidth="2.5"
           className={
             aligned
-              ? "fill-white stroke-emerald-500 dark:fill-slate-900"
-              : "fill-white stroke-emerald-200 dark:fill-slate-900 dark:stroke-slate-700"
+              ? "fill-surface stroke-emerald-500"
+              : "fill-surface stroke-brass"
           }
         />
         <circle
           cx="100"
           cy="100"
-          r="78"
-          className="fill-none stroke-emerald-100 dark:stroke-slate-800"
+          r="80"
+          className="fill-none stroke-hairline"
           strokeWidth="1"
         />
+
+        {TICKS.map((angle) => {
+          const rad = (angle * Math.PI) / 180;
+          const major = angle % 45 === 0;
+          const inner = major ? 80 : 85;
+          return (
+            <line
+              key={angle}
+              x1={100 + Math.sin(rad) * inner}
+              y1={100 - Math.cos(rad) * inner}
+              x2={100 + Math.sin(rad) * 90}
+              y2={100 - Math.cos(rad) * 90}
+              className={major ? "stroke-brass" : "stroke-hairline"}
+              strokeWidth={major ? 2 : 1}
+              strokeLinecap="round"
+            />
+          );
+        })}
 
         {/* Penanda target tetap di atas: sejajarkan panah ke sini saat pakai kompas. */}
         {realtime && (
           <g>
             <polygon
-              points="100,6 93,20 107,20"
-              className={aligned ? "fill-emerald-500" : "fill-amber-500"}
+              points="100,5 93,19 107,19"
+              className={aligned ? "fill-emerald-500" : "fill-brass"}
             />
             <line
               x1="100"
@@ -66,27 +87,27 @@ export function Compass({
               x2="100"
               y2="100"
               strokeWidth="1"
-              strokeDasharray="3 4"
-              className={
-                aligned
-                  ? "stroke-emerald-400"
-                  : "stroke-slate-300 dark:stroke-slate-600"
-              }
+              strokeDasharray="2 5"
+              className={aligned ? "stroke-emerald-400" : "stroke-hairline"}
             />
           </g>
         )}
 
         {CARDINALS.map(({ label, angle }) => {
           const rad = (angle * Math.PI) / 180;
-          const x = 100 + Math.sin(rad) * 88;
-          const y = 100 - Math.cos(rad) * 88;
+          const x = 100 + Math.sin(rad) * 68;
+          const y = 100 - Math.cos(rad) * 68;
           return (
             <text
               key={label}
               x={x}
               y={y + 4}
               textAnchor="middle"
-              className="fill-slate-500 text-[11px] font-semibold dark:fill-slate-400"
+              className={
+                angle === 0
+                  ? "fill-brass text-[13px] font-bold"
+                  : "fill-muted text-[11px] font-semibold"
+              }
             >
               {label}
             </text>
@@ -98,23 +119,31 @@ export function Compass({
           style={{ transform: `rotate(${needleAngle}deg)` }}
         >
           <polygon
-            points="100,22 108,104 100,96 92,104"
-            className={aligned ? "fill-emerald-500" : "fill-emerald-600"}
+            points="100,24 107,105 100,97 93,105"
+            className={aligned ? "fill-emerald-500" : "fill-brass"}
           />
           <polygon
-            points="100,178 108,96 100,104 92,96"
-            className="fill-slate-300 dark:fill-slate-600"
+            points="100,176 107,95 100,103 93,95"
+            className="fill-hairline"
           />
         </g>
 
-        <circle cx="100" cy="100" r="6" className="fill-emerald-700" />
+        <circle
+          cx="100"
+          cy="100"
+          r="5"
+          className={aligned ? "fill-emerald-600" : "fill-brass-strong"}
+        />
       </svg>
 
       <div className="text-center">
-        <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-400">
+        <p
+          className="font-display text-5xl font-semibold tracking-tight tabular-nums text-foreground"
+          translate="no"
+        >
           {bearing.degrees}
         </p>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-1 text-sm text-muted">
           Azimut dari Utara Sejati · {bearing.compass}
         </p>
       </div>

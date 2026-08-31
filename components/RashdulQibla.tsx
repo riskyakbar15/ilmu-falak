@@ -51,7 +51,7 @@ export function RashdulQibla() {
       <h2 className="text-sm font-semibold text-sky-800 dark:text-sky-300">
         Rashdul Qibla berikutnya
       </h2>
-      <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+      <p className="mt-1 text-xs text-muted">
         Saat Matahari tepat di atas Ka&apos;bah — bayangan benda tegak menunjuk
         lurus menjauhi kiblat, jadi arah kiblat bisa diverifikasi tanpa alat.
       </p>
@@ -60,11 +60,14 @@ export function RashdulQibla() {
           Sedang berlangsung — perhatikan bayangan!
         </p>
       ) : (
-        <p className="mt-2 font-mono text-xl font-bold text-sky-700 dark:text-sky-400">
+        <p
+          className="mt-2 font-mono text-xl font-bold tabular-nums text-sky-700 dark:text-sky-400"
+          translate="no"
+        >
           {formatCountdown(remaining)}
         </p>
       )}
-      <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+      <p className="mt-1 text-xs text-muted">
         {wibFormatter.format(event.date)} WIB
       </p>
     </section>

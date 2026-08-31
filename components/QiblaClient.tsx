@@ -120,16 +120,21 @@ export function QiblaClient() {
           )}
 
           <dl className="grid w-full grid-cols-2 gap-3 text-sm">
-            <div className="rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
-              <dt className="text-slate-500 dark:text-slate-400">
-                Jarak ke Ka&apos;bah
-              </dt>
-              <dd className="text-lg font-semibold">
+            <div className="panel p-3">
+              <dt className="text-muted">Jarak ke Ka&apos;bah</dt>
+              <dd className="text-lg font-semibold tabular-nums">
                 {Math.round(result.distance).toLocaleString("id-ID")} km
               </dd>
             </div>
-            <div className="rounded-lg bg-slate-100 p-3 dark:bg-slate-800">
-              <dt className="text-slate-500 dark:text-slate-400">Lokasi</dt>
+            <div className="panel p-3">
+              <dt className="flex items-center justify-between gap-2 text-muted">
+                Lokasi
+                {source && (
+                  <span className="rounded-full bg-brass/15 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-brass">
+                    {source === "gps" ? "GPS" : "Manual"}
+                  </span>
+                )}
+              </dt>
               <dd className="text-sm font-semibold">
                 {label ??
                   `${position!.lat.toFixed(4)}, ${position!.lng.toFixed(4)}`}
@@ -148,7 +153,7 @@ export function QiblaClient() {
                   <button
                     type="button"
                     onClick={orientation.requestPermission}
-                    className="font-semibold underline"
+                    className="font-semibold text-brass underline underline-offset-2"
                   >
                     Aktifkan kompas
                   </button>
@@ -156,7 +161,7 @@ export function QiblaClient() {
               )}
             </p>
           ) : (
-            <p className="text-center text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-center text-xs text-muted">
               {result.declination.available
                 ? `Dikoreksi deklinasi ${result.declination.value.toFixed(1)}°.`
                 : "Model deklinasi tak tersedia; menampilkan Utara Sejati tanpa koreksi."}{" "}
@@ -173,7 +178,7 @@ export function QiblaClient() {
           <PrayerTimes lat={position!.lat} lng={position!.lng} />
         </div>
       ) : (
-        <p className="text-center text-slate-500 dark:text-slate-400">
+        <p className="panel px-4 py-8 text-center text-sm text-muted">
           Tentukan lokasi Anda untuk menghitung arah kiblat.
         </p>
       )}
@@ -183,7 +188,7 @@ export function QiblaClient() {
         onSelectLocation={handleSelect}
         status={geo.status}
         error={geo.error}
-        gpsActive={source === "gps"}
+        source={source}
       />
 
       <RashdulQibla />

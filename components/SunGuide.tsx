@@ -51,12 +51,12 @@ export function SunGuide({ lat, lng, qiblaAzimuth }: SunGuideProps) {
       <h2 className="mb-1 text-sm font-semibold text-amber-800 dark:text-amber-300">
         Arah via Matahari (tanpa kompas)
       </h2>
-      <p className="mb-3 text-xs text-slate-600 dark:text-slate-400">
+      <p className="mb-3 text-xs text-muted">
         Dihitung dari lokasi &amp; waktu — tidak terpengaruh gangguan magnet.
       </p>
 
       {belowHorizon ? (
-        <p className="text-sm text-slate-600 dark:text-slate-400">
+        <p className="text-sm text-muted">
           Matahari sedang di bawah ufuk, jadi metode bayangan belum bisa dipakai
           sekarang. Coba lagi saat siang hari.
         </p>
@@ -72,14 +72,14 @@ export function SunGuide({ lat, lng, qiblaAzimuth }: SunGuideProps) {
               cx="100"
               cy="100"
               r="88"
-              className="fill-white stroke-amber-200 dark:fill-slate-900 dark:stroke-slate-700"
+              className="fill-surface stroke-hairline"
               strokeWidth="2"
             />
             <text
               x="100"
               y="20"
               textAnchor="middle"
-              className="fill-slate-500 text-[10px] font-semibold dark:fill-slate-400"
+              className="fill-muted text-[10px] font-semibold"
             >
               U
             </text>
@@ -98,18 +98,18 @@ export function SunGuide({ lat, lng, qiblaAzimuth }: SunGuideProps) {
               r="10"
               className="fill-amber-400"
             />
-            <circle cx="100" cy="100" r="4" className="fill-slate-500" />
+            <circle cx="100" cy="100" r="4" className="fill-muted" />
           </svg>
 
           <div className="space-y-2 text-sm">
-            <p className="text-slate-700 dark:text-slate-300">
+            <p className="text-foreground">
               Menghadap Matahari, kiblat berada{" "}
               <span className="font-semibold text-emerald-700 dark:text-emerald-400">
                 {describeOffset(offset)}
               </span>
               .
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-muted">
               Bayangan tongkat tegak menunjuk{" "}
               {formatBearing(shadowAzimuth).compass} (
               {formatBearing(shadowAzimuth).degrees}); Matahari di{" "}

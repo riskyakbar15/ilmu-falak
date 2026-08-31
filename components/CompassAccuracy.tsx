@@ -27,9 +27,8 @@ const BADGE: Record<
   },
   unknown: {
     label: "Akurasi kompas: tidak diketahui",
-    className:
-      "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-    dot: "bg-slate-400",
+    className: "bg-surface text-muted",
+    dot: "bg-muted",
   },
 };
 

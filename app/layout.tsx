@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Fraunces } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,8 +12,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Serif display berkarakter untuk judul — nuansa keilmuan/peta bintang.
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
-  title: "Arah Kiblat — Ilmu Falak",
+  title: "Arah Kiblat - Ilmu Falak",
   description:
     "Penentu arah kiblat berbasis PWA yang akurat dan transparan: menampilkan metode perhitungan azimut great-circle beserta rujukannya. Berjalan penuh di peramban, offline dan privasi terjaga.",
   applicationName: "Arah Kiblat",
@@ -34,16 +42,19 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#059669",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f6f3ea" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1020" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="id"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
+      <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {children}
       </body>
     </html>
