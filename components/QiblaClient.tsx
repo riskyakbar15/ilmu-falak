@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Compass } from "@/components/Compass";
 import { SunGuide } from "@/components/SunGuide";
 import { RashdulQibla } from "@/components/RashdulQibla";
+import { PrayerTimes } from "@/components/PrayerTimes";
 import { LocationInput } from "@/components/LocationInput";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useDeviceOrientation } from "@/hooks/useDeviceOrientation";
@@ -163,6 +164,8 @@ export function QiblaClient() {
             lng={position!.lng}
             qiblaAzimuth={result.azimuth}
           />
+
+          <PrayerTimes lat={position!.lat} lng={position!.lng} />
         </div>
       ) : (
         <p className="text-center text-slate-500 dark:text-slate-400">
