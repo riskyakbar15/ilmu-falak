@@ -15,16 +15,15 @@ export interface SolarPosition {
   declination: number;
 }
 
-/**
- * Posisi Matahari untuk lokasi & waktu tertentu, memakai algoritma NOAA.
- * Dihitung murni dari lat/lng + waktu (tanpa sensor) sehingga bisa jadi acuan
- * arah kiblat via bayangan/Matahari.
- */
-export function solarPosition(
-  lat: number,
-  lng: number,
-  date: Date = new Date(),
-): SolarPosition {
+export interface SolarCoords {
+  /** Deklinasi Matahari (derajat). */
+  declination: number;
+  /** Equation of time (menit). */
+  eqTimeMinutes: number;
+}
+
+/** Deklinasi Matahari & equation of time untuk suatu waktu (algoritma NOAA). */
+export function solarCoords(date: Date = new Date()): SolarCoords {
   const julianDay = date.getTime() / 86_400_000 + 2_440_587.5;
   const t = (julianDay - 2_451_545) / 36_525;
 
@@ -54,7 +53,7 @@ export function solarPosition(
   );
 
   const y = Math.tan(toRadians(obliqCorr / 2)) ** 2;
-  const eqTime =
+  const eqTimeMinutes =
     4 *
     toDegrees(
       y * Math.sin(2 * toRadians(meanLong)) -
@@ -67,6 +66,21 @@ export function solarPosition(
         0.5 * y * y * Math.sin(4 * toRadians(meanLong)) -
         1.25 * eccent * eccent * Math.sin(2 * toRadians(meanAnom)),
     );
+
+  return { declination, eqTimeMinutes };
+}
+
+/**
+ * Posisi Matahari untuk lokasi & waktu tertentu, memakai algoritma NOAA.
+ * Dihitung murni dari lat/lng + waktu (tanpa sensor) sehingga bisa jadi acuan
+ * arah kiblat via bayangan/Matahari.
+ */
+export function solarPosition(
+  lat: number,
+  lng: number,
+  date: Date = new Date(),
+): SolarPosition {
+  const { declination, eqTimeMinutes: eqTime } = solarCoords(date);
 
   const minutesUtc =
     date.getUTCHours() * 60 + date.getUTCMinutes() + date.getUTCSeconds() / 60;
