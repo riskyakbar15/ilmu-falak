@@ -2,7 +2,7 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-63%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-77%20passing-brightgreen)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -37,6 +37,9 @@ sekaligus bahan belajar ilmu falak.
 - **Kompas real-time** dari sensor perangkat, dengan **koreksi Deklinasi Magnetik**
   (model WMM 2025, offline), heading terkompensasi kemiringan, dan koreksi orientasi
   layar (portrait/landscape).
+- **Indikator akurasi kompas** + **kalibrasi terpandu** (ajakan gerak angka 8 saat
+  akurasi rendah). Memakai nilai resmi iOS; di Android diperkirakan dari heuristik
+  goyangan (jitter) heading.
 - Fallback statis bila sensor tak ada atau tidak mengacu Utara Sejati.
 
 ### Metode Matahari (tanpa kompas)
@@ -130,7 +133,7 @@ flowchart TD
 
 ```Struktur
 app/          Halaman, layout, manifest, service worker (Serwist)
-components/    Compass, LocationInput, MethodPanel, SunGuide, RashdulQibla, PrayerTimes, QiblaClient
+components/    Compass, LocationInput, MethodPanel, SunGuide, RashdulQibla, PrayerTimes, CompassAccuracy, QiblaClient
 hooks/         useGeolocation, useDeviceOrientation
 lib/           Fungsi murni: qibla, declination, compass, format, solar, prayer, storage, constants
 data/          cities.ts (dataset kota offline)
@@ -208,14 +211,16 @@ sertifikat otomatis; Nginx memuat ulang berkala tanpa downtime.
 
 ## Pengujian
 
-63 test (Vitest + Testing Library) mencakup:
+77 test (Vitest + Testing Library) mencakup:
 
 - **Fungsi murni** `lib/` — azimut kiblat divalidasi terhadap nilai terpublikasi
   (Jakarta, New York, London, Istanbul), posisi Matahari terhadap momen Rashdul Qibla,
-  serta jadwal salat (urutan, simetri terbit/terbenam, metode & madzhab, ihtiyat).
+  jadwal salat (urutan, simetri terbit/terbenam, metode & madzhab, ihtiyat), instruksi
+  belok, serta level akurasi kompas (nilai iOS & heuristik jitter).
 - **Hooks** — `useGeolocation` (izin, fallback, pembersihan watcher) dan
-  `useDeviceOrientation` (heading absolut vs relatif).
-- **Komponen** — `LocationInput` (pencarian kota, validasi koordinat) dan `Compass`.
+  `useDeviceOrientation` (heading absolut vs relatif, akurasi & estimasi jitter).
+- **Komponen** — `LocationInput` (pencarian kota, validasi koordinat), `Compass`, dan
+  `CompassAccuracy` (badge & panduan kalibrasi).
 
 ```bash
 npm test
