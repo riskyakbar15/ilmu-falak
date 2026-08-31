@@ -14,7 +14,7 @@ function setup(
       onSelectLocation={onSelectLocation}
       status="idle"
       error={null}
-      gpsActive={false}
+      source={null}
       {...overrides}
     />,
   );
@@ -31,7 +31,7 @@ describe("LocationInput", () => {
   });
 
   it("menampilkan status aktif saat GPS aktif dan granted", () => {
-    setup({ gpsActive: true, status: "granted" });
+    setup({ source: "gps", status: "granted" });
     expect(
       screen.getByRole("button", { name: /lokasi gps aktif/i }),
     ).toBeInTheDocument();
