@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { compassRotation, turnInstruction } from "./compass";
+import {
+  compassRotation,
+  turnInstruction,
+  accuracyLevel,
+  headingJitter,
+  jitterToAccuracy,
+} from "./compass";
 import { normalizeDegrees } from "./qibla";
 
 // compassRotation menghitung sudut putar panah kompas relatif terhadap layar.
@@ -53,5 +59,56 @@ describe("turnInstruction", () => {
     const t = turnInstruction(200);
     expect(t.direction).toBe("left");
     expect(t.degrees).toBe(160);
+  });
+});
+
+describe("accuracyLevel", () => {
+  it("null/undefined → unknown", () => {
+    expect(accuracyLevel(null)).toBe("unknown");
+    expect(accuracyLevel(undefined)).toBe("unknown");
+  });
+
+  it("negatif (tak terkalibrasi) → low", () => {
+    expect(accuracyLevel(-1)).toBe("low");
+  });
+
+  it("memetakan derajat ketidakpastian ke level", () => {
+    expect(accuracyLevel(5)).toBe("high");
+    expect(accuracyLevel(15)).toBe("high");
+    expect(accuracyLevel(25)).toBe("medium");
+    expect(accuracyLevel(30)).toBe("medium");
+    expect(accuracyLevel(45)).toBe("low");
+  });
+});
+
+describe("headingJitter", () => {
+  it("null bila sampel kurang dari 5", () => {
+    expect(headingJitter([90, 90, 90, 90])).toBeNull();
+  });
+
+  it("≈ 0 untuk heading konstan", () => {
+    expect(headingJitter([90, 90, 90, 90, 90, 90])).toBeCloseTo(0, 5);
+  });
+
+  it("kecil untuk sampel di sekitar 0° (wrap-around)", () => {
+    const j = headingJitter([359, 0, 1, 359, 0, 1])!;
+    expect(j).toBeLessThan(5);
+  });
+
+  it("besar untuk sampel yang tersebar", () => {
+    const j = headingJitter([0, 60, 120, 180, 240, 300])!;
+    expect(j).toBeGreaterThan(30);
+  });
+});
+
+describe("jitterToAccuracy", () => {
+  it("null → unknown", () => {
+    expect(jitterToAccuracy(null)).toBe("unknown");
+  });
+
+  it("memetakan jitter ke level", () => {
+    expect(jitterToAccuracy(3)).toBe("high");
+    expect(jitterToAccuracy(10)).toBe("medium");
+    expect(jitterToAccuracy(20)).toBe("low");
   });
 });

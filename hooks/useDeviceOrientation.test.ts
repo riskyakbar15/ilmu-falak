@@ -33,6 +33,40 @@ describe("useDeviceOrientation", () => {
     expect(result.current.absolute).toBe(true);
   });
 
+  it("mengekspos akurasi dari webkitCompassAccuracy", async () => {
+    const { result } = renderHook(() => useDeviceOrientation());
+    await act(async () => {
+      await result.current.requestPermission();
+    });
+
+    act(() =>
+      fire("deviceorientation", {
+        webkitCompassHeading: 90,
+        webkitCompassAccuracy: 12,
+      }),
+    );
+
+    expect(result.current.accuracy).toBe(12);
+    expect(result.current.accuracyLevel).toBe("high");
+  });
+
+  it("menaksir akurasi via jitter saat heading stabil (heuristik Android)", async () => {
+    const { result } = renderHook(() => useDeviceOrientation());
+    await act(async () => {
+      await result.current.requestPermission();
+    });
+
+    // Enam event absolut dengan heading nyaris konstan → jitter kecil → akurasi baik.
+    act(() => {
+      for (let i = 0; i < 6; i++) {
+        fire("deviceorientationabsolute", { alpha: 100, absolute: true });
+      }
+    });
+
+    expect(result.current.accuracy).toBeNull();
+    expect(result.current.accuracyLevel).toBe("high");
+  });
+
   it("mengabaikan event relatif setelah data absolut diterima", async () => {
     const { result } = renderHook(() => useDeviceOrientation());
     await act(async () => {
