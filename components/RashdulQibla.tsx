@@ -47,8 +47,8 @@ export function RashdulQibla() {
   const isNow = remaining <= 0;
 
   return (
-    <section className="w-full rounded-xl border border-sky-200 bg-sky-50/60 p-4 dark:border-sky-900/40 dark:bg-sky-950/20">
-      <h2 className="text-sm font-semibold text-sky-800 dark:text-sky-300">
+    <section className="w-full rounded-xl border border-event-border bg-event-soft p-4">
+      <h2 className="text-sm font-semibold text-event-text">
         Rashdul Qibla berikutnya
       </h2>
       <p className="mt-1 text-xs text-muted">
@@ -56,12 +56,12 @@ export function RashdulQibla() {
         lurus menjauhi kiblat, jadi arah kiblat bisa diverifikasi tanpa alat.
       </p>
       {isNow ? (
-        <p className="mt-2 text-xl font-bold text-sky-700 dark:text-sky-400">
+        <p className="mt-2 text-xl font-bold text-event-text">
           Sedang berlangsung — perhatikan bayangan!
         </p>
       ) : (
         <p
-          className="mt-2 font-mono text-xl font-bold tabular-nums text-sky-700 dark:text-sky-400"
+          className="mt-2 font-mono text-xl font-bold tabular-nums text-event-text"
           translate="no"
         >
           {formatCountdown(remaining)}

@@ -105,8 +105,8 @@ export function QiblaClient() {
               aria-live="polite"
               className={
                 hint.aligned
-                  ? "w-full rounded-lg bg-emerald-600 px-4 py-2 text-center text-sm font-semibold text-white"
-                  : "w-full rounded-lg bg-amber-100 px-4 py-2 text-center text-sm font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+                  ? "w-full rounded-lg bg-success-strong px-4 py-2 text-center text-sm font-semibold text-on-success"
+                  : "w-full rounded-lg bg-warning-soft px-4 py-2 text-center text-sm font-semibold text-warning"
               }
             >
               {hint.aligned
@@ -143,7 +143,7 @@ export function QiblaClient() {
           </dl>
 
           {rotation === null ? (
-            <p className="text-center text-sm text-amber-600 dark:text-amber-400">
+            <p className="text-center text-sm text-warning">
               {relativeOnly
                 ? "Sensor kompas perangkat tidak mengacu Utara Sejati, jadi tidak dipakai. Gunakan metode Matahari di bawah, atau arahkan sisi atas perangkat ke Utara lalu putar sesuai azimut."
                 : "Kompas real-time tidak aktif. Arahkan sisi atas perangkat ke Utara Sejati, lalu putar sesuai azimut di atas."}

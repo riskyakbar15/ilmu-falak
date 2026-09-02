@@ -44,7 +44,7 @@ export function Compass({
           strokeWidth="2.5"
           className={
             aligned
-              ? "fill-surface stroke-emerald-500"
+              ? "fill-surface stroke-success-accent"
               : "fill-surface stroke-brass"
           }
         />
@@ -79,7 +79,7 @@ export function Compass({
           <g>
             <polygon
               points="100,5 93,19 107,19"
-              className={aligned ? "fill-emerald-500" : "fill-brass"}
+              className={aligned ? "fill-success-accent" : "fill-brass"}
             />
             <line
               x1="100"
@@ -88,7 +88,7 @@ export function Compass({
               y2="100"
               strokeWidth="1"
               strokeDasharray="2 5"
-              className={aligned ? "stroke-emerald-400" : "stroke-hairline"}
+              className={aligned ? "stroke-success-accent" : "stroke-hairline"}
             />
           </g>
         )}
@@ -120,7 +120,7 @@ export function Compass({
         >
           <polygon
             points="100,24 107,105 100,97 93,105"
-            className={aligned ? "fill-emerald-500" : "fill-brass"}
+            className={aligned ? "fill-success-accent" : "fill-brass"}
           />
           <polygon
             points="100,176 107,95 100,103 93,95"
@@ -132,7 +132,7 @@ export function Compass({
           cx="100"
           cy="100"
           r="5"
-          className={aligned ? "fill-emerald-600" : "fill-brass-strong"}
+          className={aligned ? "fill-success-accent" : "fill-brass-strong"}
         />
       </svg>
 

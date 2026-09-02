@@ -82,7 +82,7 @@ export function LocationInput({
           aria-pressed={gpsGranted}
           className={
             gpsGranted
-              ? "flex w-full items-center justify-center gap-2 rounded-lg bg-brass px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
+              ? "flex w-full items-center justify-center gap-2 rounded-lg bg-brass px-4 py-2.5 text-sm font-semibold text-on-brass shadow-sm transition"
               : "flex w-full items-center justify-center gap-2 rounded-lg border border-brass bg-surface px-4 py-2.5 text-sm font-semibold text-brass transition hover:bg-brass/10 disabled:opacity-60"
           }
         >
@@ -115,10 +115,7 @@ export function LocationInput({
           )}
         </button>
         {error && (
-          <p
-            role="alert"
-            className="mt-2 text-sm text-amber-600 dark:text-amber-400"
-          >
+          <p role="alert" className="mt-2 text-sm text-warning">
             {error}
           </p>
         )}

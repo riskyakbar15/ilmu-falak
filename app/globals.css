@@ -2,26 +2,97 @@
 
 /* Skema astrolab: midnight/parchment + aksen kuningan; hijau = makna kiblat. */
 :root {
-  --background: #f6f3ea; /* parchment (peta bintang) */
+  --background: #f0e9d8; /* parchment (peta bintang) */
   --surface: #ffffff;
   --foreground: #1b2233;
-  --muted: #5b6478;
-  --hairline: #e4ddc9;
-  --brass: #a8791c;
-  --brass-strong: #8f6412;
+  --muted: #545d72;
+  --hairline: #ddd1b5;
+  --brass: #8a600f;
+  --brass-strong: #74510d;
+  --on-brass: #ffffff;
+  /* Peran status (terang): teks di atas tint, tint, garis, aksen grafis. */
+  --success-text: #065f46;
+  --success-soft: #ecfdf5;
+  --success-border: #a7f3d0;
+  --success-accent: #059669;
+  --success-strong: #047857;
+  --on-success: #ffffff;
+  --warning: #92400e;
+  --warning-soft: #fef3c7;
+  --warning-border: #fde68a;
+  --warning-accent: #d97706;
+  --event-text: #0369a1;
+  --event-soft: #f0f9ff;
+  --event-border: #bae6fd;
+  --danger-text: #991b1b;
+  --danger-soft: #fef2f2;
+  --danger-border: #fecaca;
+  --danger-accent: #ef4444;
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b1020; /* midnight */
-    --surface: #141a2e;
-    --foreground: #e8e2d0; /* parchment ink */
-    --muted: #9aa2b8;
-    --hairline: #26304c;
-    --brass: #c9a227;
-    --brass-strong: #d8b43a;
-    color-scheme: dark;
+/* Nilai gelap dipakai bila: dipaksa (data-theme="dark") atau ikut sistem gelap
+   selama tidak dipaksa terang. */
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+  --background: #0b1020; /* midnight */
+  --surface: #141a2e;
+  --foreground: #e8e2d0; /* parchment ink */
+  --muted: #9aa2b8;
+  --hairline: #26304c;
+  --brass: #c9a227;
+  --brass-strong: #d8b43a;
+  --on-brass: #0b1020;
+  /* Peran status (gelap). */
+  --success-text: #6ee7b7;
+  --success-soft: rgba(6, 78, 59, 0.3);
+  --success-border: rgba(6, 95, 70, 0.4);
+  --success-accent: #10b981;
+  --success-strong: #047857;
+  --on-success: #ffffff;
+  --warning: #fbbf24;
+  --warning-soft: rgba(69, 26, 3, 0.4);
+  --warning-border: rgba(120, 53, 15, 0.4);
+  --warning-accent: #f59e0b;
+  --event-text: #38bdf8;
+  --event-soft: rgba(8, 47, 73, 0.2);
+  --event-border: rgba(12, 74, 110, 0.4);
+  --danger-text: #fca5a5;
+  --danger-soft: rgba(69, 10, 10, 0.3);
+  --danger-border: rgba(127, 29, 29, 0.4);
+  --danger-accent: #f87171;
+  color-scheme: dark;
+}
+
+/* Default (tanpa preferensi) mengikuti sistem: paksa terang saat sistem terang. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --background: #f0e9d8;
+    --surface: #ffffff;
+    --foreground: #1b2233;
+    --muted: #545d72;
+    --hairline: #ddd1b5;
+    --brass: #8a600f;
+    --brass-strong: #74510d;
+    --on-brass: #ffffff;
+    --success-text: #065f46;
+    --success-soft: #ecfdf5;
+    --success-border: #a7f3d0;
+    --success-accent: #059669;
+    --success-strong: #047857;
+    --on-success: #ffffff;
+    --warning: #92400e;
+    --warning-soft: #fef3c7;
+    --warning-border: #fde68a;
+    --warning-accent: #d97706;
+    --event-text: #0369a1;
+    --event-soft: #f0f9ff;
+    --event-border: #bae6fd;
+    --danger-text: #991b1b;
+    --danger-soft: #fef2f2;
+    --danger-border: #fecaca;
+    --danger-accent: #ef4444;
+    color-scheme: light;
   }
 }
 
@@ -33,6 +104,24 @@
   --color-hairline: var(--hairline);
   --color-brass: var(--brass);
   --color-brass-strong: var(--brass-strong);
+  --color-on-brass: var(--on-brass);
+  --color-success-text: var(--success-text);
+  --color-success-soft: var(--success-soft);
+  --color-success-border: var(--success-border);
+  --color-success-accent: var(--success-accent);
+  --color-success-strong: var(--success-strong);
+  --color-on-success: var(--on-success);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-border: var(--warning-border);
+  --color-warning-accent: var(--warning-accent);
+  --color-event-text: var(--event-text);
+  --color-event-soft: var(--event-soft);
+  --color-event-border: var(--event-border);
+  --color-danger-text: var(--danger-text);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-border: var(--danger-border);
+  --color-danger-accent: var(--danger-accent);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-fraunces);
@@ -73,9 +162,11 @@ summary {
   font-family: var(--font-display), ui-serif, Georgia, serif;
 }
 
-/* Permukaan kartu konsisten. */
+/* Permukaan kartu konsisten. Bayangan navy tipis mengangkat kartu di tema terang;
+   nyaris tak tampak di tema gelap. */
 .panel {
   background-color: var(--surface);
   border: 1px solid var(--hairline);
   border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(27, 34, 51, 0.06);
 }

@@ -10,20 +10,18 @@ const BADGE: Record<
 > = {
   high: {
     label: "Akurasi kompas: baik",
-    className:
-      "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300",
-    dot: "bg-emerald-500",
+    className: "bg-success-soft text-success-text",
+    dot: "bg-success-accent",
   },
   medium: {
     label: "Akurasi kompas: sedang",
-    className:
-      "bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300",
-    dot: "bg-amber-500",
+    className: "bg-warning-soft text-warning",
+    dot: "bg-warning-accent",
   },
   low: {
     label: "Akurasi kompas: rendah",
-    className: "bg-red-50 text-red-800 dark:bg-red-950/30 dark:text-red-300",
-    dot: "bg-red-500",
+    className: "bg-danger-soft text-danger-text",
+    dot: "bg-danger-accent",
   },
   unknown: {
     label: "Akurasi kompas: tidak diketahui",
@@ -46,7 +44,7 @@ export function CompassAccuracy({ level }: CompassAccuracyProps) {
       </div>
 
       {needsCalibration && (
-        <div className="mt-2 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50/60 p-3 text-xs text-red-800 dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-300">
+        <div className="mt-2 flex items-center gap-3 rounded-lg border border-danger-border bg-danger-soft p-3 text-xs text-danger-text">
           <svg
             viewBox="0 0 120 60"
             className="h-10 w-20 shrink-0 motion-safe:animate-pulse"
@@ -55,7 +53,7 @@ export function CompassAccuracy({ level }: CompassAccuracyProps) {
             <path
               d="M60,30 C60,8 18,8 18,30 C18,52 60,52 60,30 C60,8 102,8 102,30 C102,52 60,52 60,30 Z"
               fill="none"
-              className="stroke-red-400"
+              className="stroke-danger-accent"
               strokeWidth="3"
               strokeLinecap="round"
             />

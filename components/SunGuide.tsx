@@ -47,8 +47,8 @@ export function SunGuide({ lat, lng, qiblaAzimuth }: SunGuideProps) {
   const qiblaEnd = pointOnDial(qiblaAzimuth, 78);
 
   return (
-    <section className="w-full rounded-xl border border-amber-200 bg-amber-50/60 p-4 dark:border-amber-900/40 dark:bg-amber-950/20">
-      <h2 className="mb-1 text-sm font-semibold text-amber-800 dark:text-amber-300">
+    <section className="w-full rounded-xl border border-warning-border bg-warning-soft p-4">
+      <h2 className="mb-1 text-sm font-semibold text-warning">
         Arah via Matahari (tanpa kompas)
       </h2>
       <p className="mb-3 text-xs text-muted">
@@ -88,7 +88,7 @@ export function SunGuide({ lat, lng, qiblaAzimuth }: SunGuideProps) {
               y1="100"
               x2={qiblaEnd.x}
               y2={qiblaEnd.y}
-              className="stroke-emerald-600"
+              className="stroke-success-accent"
               strokeWidth="4"
               strokeLinecap="round"
             />
@@ -96,7 +96,7 @@ export function SunGuide({ lat, lng, qiblaAzimuth }: SunGuideProps) {
               cx={sunPoint.x}
               cy={sunPoint.y}
               r="10"
-              className="fill-amber-400"
+              className="fill-warning-accent"
             />
             <circle cx="100" cy="100" r="4" className="fill-muted" />
           </svg>
@@ -104,7 +104,7 @@ export function SunGuide({ lat, lng, qiblaAzimuth }: SunGuideProps) {
           <div className="space-y-2 text-sm">
             <p className="text-foreground">
               Menghadap Matahari, kiblat berada{" "}
-              <span className="font-semibold text-emerald-700 dark:text-emerald-400">
+              <span className="font-semibold text-success-text">
                 {describeOffset(offset)}
               </span>
               .
