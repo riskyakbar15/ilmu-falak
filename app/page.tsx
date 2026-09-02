@@ -1,10 +1,16 @@
 import { QiblaClient } from "@/components/QiblaClient";
 import { MethodPanel } from "@/components/MethodPanel";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { HijriToday } from "@/components/HijriToday";
 
 export default function Home() {
   return (
-    <div className="flex flex-1 flex-col items-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-10 font-sans">
-      <main className="flex w-full max-w-md flex-col items-center gap-8">
+    <div className="flex flex-1 flex-col items-center px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-6 font-sans">
+      <main className="flex w-full max-w-md flex-col items-center gap-6">
+        <div className="flex w-full justify-end">
+          <ThemeToggle />
+        </div>
+
         <header className="flex flex-col items-center text-center">
           <span
             className="inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-brass"
@@ -44,6 +50,8 @@ export default function Home() {
             dengan metode dan rujukannya.
           </p>
         </header>
+
+        <HijriToday />
 
         <QiblaClient />
         <MethodPanel />

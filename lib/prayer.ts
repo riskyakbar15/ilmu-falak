@@ -219,3 +219,32 @@ export function nextPrayer(times: PrayerTimes, now: Date): PrayerName | null {
   }
   return null;
 }
+
+export interface UpcomingPrayer {
+  name: PrayerName;
+  at: Date;
+}
+
+/**
+ * Salat fardhu berikutnya: hari ini bila masih ada, atau Subuh besok bila sudah
+ * lewat Isya. `day` = tanggal (UTC-midnight dari hari lokal), `now` = waktu kini.
+ */
+export function upcomingPrayer(
+  day: Date,
+  now: Date,
+  lat: number,
+  lng: number,
+  options: PrayerOptions = {},
+): UpcomingPrayer {
+  const today = prayerTimes(day, lat, lng, options);
+  const next = nextPrayer(today, now);
+  if (next && today[next]) return { name: next, at: today[next]! };
+
+  const tomorrow = prayerTimes(
+    new Date(day.getTime() + 86_400_000),
+    lat,
+    lng,
+    options,
+  );
+  return { name: "fajr", at: tomorrow.fajr! };
+}

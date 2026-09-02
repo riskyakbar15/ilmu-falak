@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   prayerTimes,
   nextPrayer,
+  upcomingPrayer,
   PRAYER_METHODS,
   PRAYER_LABELS,
   DEFAULT_IHTIYAT,
@@ -58,6 +59,12 @@ function loadIhtiyat(): Required<IhtiyatMinutes> {
   }
 }
 
+function formatCountdown(ms: number): string {
+  const total = Math.max(0, Math.floor(ms / 1000));
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(Math.floor(total / 3600))}:${pad(Math.floor((total % 3600) / 60))}:${pad(total % 60)}`;
+}
+
 export function PrayerTimes({ lat, lng }: PrayerTimesProps) {
   const [now, setNow] = useState<Date | null>(null);
   const [method, setMethod] = useState<PrayerMethodId>("kemenag");
@@ -72,7 +79,7 @@ export function PrayerTimes({ lat, lng }: PrayerTimesProps) {
     setAsr(loadPref<AsrMethod>(ASR_KEY, "standard"));
     setIhtiyat(loadIhtiyat());
     setNow(new Date());
-    const id = setInterval(() => setNow(new Date()), 30_000);
+    const id = setInterval(() => setNow(new Date()), 1_000);
     return () => clearInterval(id);
   }, []);
 
@@ -88,6 +95,11 @@ export function PrayerTimes({ lat, lng }: PrayerTimesProps) {
   if (!now || !times) return null;
 
   const upcoming = nextPrayer(times, now);
+  const day = new Date(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()),
+  );
+  const next = upcomingPrayer(day, now, lat, lng, { method, asr, ihtiyat });
+  const remainingMs = next.at.getTime() - now.getTime();
 
   function changeMethod(value: PrayerMethodId) {
     setMethod(value);
@@ -115,6 +127,22 @@ export function PrayerTimes({ lat, lng }: PrayerTimesProps) {
 
   return (
     <section className="panel w-full p-4">
+      <div className="mb-3 rounded-lg bg-brass/10 p-3 text-center">
+        <p className="text-[0.7rem] font-semibold uppercase tracking-wide text-brass">
+          Salat berikutnya
+        </p>
+        <p className="mt-0.5 font-display text-2xl font-semibold text-foreground">
+          {PRAYER_LABELS[next.name]} · {timeFormatter.format(next.at)}
+        </p>
+        <p
+          className="mt-0.5 text-sm tabular-nums text-muted"
+          aria-live="off"
+          translate="no"
+        >
+          dalam {formatCountdown(remainingMs)}
+        </p>
+      </div>
+
       <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="text-sm font-semibold text-brass">
           Jadwal Salat Hari Ini
