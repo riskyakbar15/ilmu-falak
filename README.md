@@ -2,7 +2,7 @@
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs)
 ![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-77%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-83%20passing-brightgreen)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
@@ -54,7 +54,14 @@ sekaligus bahan belajar ilmu falak.
 - **Jadwal salat harian** (Subuh, Terbit, Dzuhur, Ashar, Magrib, Isya) dihitung dari
   posisi Matahari, dengan pilihan **metode** (Kemenag RI, MWL, ISNA, Umm al-Qura,
   Mesir), **madzhab Ashar** (Standar/Hanafi), dan **ihtiyat per waktu** (menit pengaman
-  tiap salat). Menyorot salat berikutnya.
+  tiap salat).
+- **Widget salat berikutnya** dengan hitung mundur (otomatis ke Subuh besok bila sudah
+  lewat Isya).
+- **Tanggal Hijriah** hari ini (kalender Umm al-Qura).
+
+### Tampilan
+
+- Tema **terang / gelap / ikuti sistem** yang bisa dipilih (disimpan di `localStorage`).
 
 ### Lokasi & PWA
 
@@ -211,7 +218,7 @@ sertifikat otomatis; Nginx memuat ulang berkala tanpa downtime.
 
 ## Pengujian
 
-77 test (Vitest + Testing Library) mencakup:
+83 test (Vitest + Testing Library) mencakup:
 
 - **Fungsi murni** `lib/` — azimut kiblat divalidasi terhadap nilai terpublikasi
   (Jakarta, New York, London, Istanbul), posisi Matahari terhadap momen Rashdul Qibla,
