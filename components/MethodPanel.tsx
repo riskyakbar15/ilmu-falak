@@ -9,9 +9,7 @@ export function MethodPanel() {
 
       <div className="mt-4 space-y-4 text-sm leading-relaxed text-foreground">
         <section>
-          <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-            Metode
-          </h3>
+          <h3 className="font-semibold text-foreground">Metode</h3>
           <p>
             {REFERENCES.method.label}. Arah kiblat dihitung sebagai azimut awal
             lingkaran besar dari lokasi Anda ke Ka&apos;bah, diukur searah jarum
@@ -23,7 +21,7 @@ export function MethodPanel() {
         </section>
 
         <section>
-          <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="font-semibold text-foreground">
             Koordinat Ka&apos;bah
           </h3>
           <p>
@@ -33,7 +31,7 @@ export function MethodPanel() {
         </section>
 
         <section>
-          <h3 className="font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="font-semibold text-foreground">
             Koreksi Deklinasi Magnetik
           </h3>
           <p>
@@ -45,9 +43,7 @@ export function MethodPanel() {
         </section>
 
         <section>
-          <h3 className="font-semibold text-slate-900 dark:text-slate-100">
-            Arah via Matahari
-          </h3>
+          <h3 className="font-semibold text-foreground">Arah via Matahari</h3>
           <p>
             Sebagai alternatif kompas, posisi Matahari (azimut &amp; ketinggian)
             dihitung dari lokasi dan waktu memakai algoritma NOAA. Selisih
