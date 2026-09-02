@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { prayerTimes, nextPrayer, PRAYER_METHODS } from "./prayer";
+import {
+  prayerTimes,
+  nextPrayer,
+  upcomingPrayer,
+  PRAYER_METHODS,
+} from "./prayer";
 
 const JAKARTA = { lat: -6.2088, lng: 106.8456 };
 
@@ -134,5 +139,24 @@ describe("nextPrayer", () => {
   it("mengembalikan null setelah Isya", () => {
     const afterIsha = new Date(times.isha!.getTime() + 60_000);
     expect(nextPrayer(times, afterIsha)).toBeNull();
+  });
+});
+
+describe("upcomingPrayer", () => {
+  const day = new Date("2025-06-01T00:00:00Z");
+  const times = prayerTimes(day, JAKARTA.lat, JAKARTA.lng);
+
+  it("mengembalikan salat hari ini yang belum lewat", () => {
+    const afterAsr = new Date(times.asr!.getTime() + 60_000);
+    const up = upcomingPrayer(day, afterAsr, JAKARTA.lat, JAKARTA.lng);
+    expect(up.name).toBe("maghrib");
+    expect(up.at.getTime()).toBe(times.maghrib!.getTime());
+  });
+
+  it("mengembalikan Subuh besok bila sudah lewat Isya", () => {
+    const afterIsha = new Date(times.isha!.getTime() + 60_000);
+    const up = upcomingPrayer(day, afterIsha, JAKARTA.lat, JAKARTA.lng);
+    expect(up.name).toBe("fajr");
+    expect(up.at.getTime()).toBeGreaterThan(times.isha!.getTime());
   });
 });
