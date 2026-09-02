@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { searchCities, type City } from "@/data/cities";
+import type { FavoriteLocation } from "@/lib/favorites";
 
 interface LocationInputProps {
   onUseGps: () => void;
@@ -10,6 +11,15 @@ interface LocationInputProps {
   error: string | null;
   /** Sumber lokasi aktif saat ini. */
   source: "gps" | "manual" | null;
+  /** Daftar lokasi favorit tersimpan. */
+  favorites: FavoriteLocation[];
+  /** Lokasi aktif saat ini (untuk tombol simpan), null bila belum ada. */
+  current: { lat: number; lng: number; label: string } | null;
+  /** True bila lokasi aktif sudah ada di favorit. */
+  currentIsFavorite: boolean;
+  onSaveFavorite: () => void;
+  onSelectFavorite: (fav: FavoriteLocation) => void;
+  onRemoveFavorite: (id: string) => void;
 }
 
 export function LocationInput({
@@ -18,6 +28,12 @@ export function LocationInput({
   status,
   error,
   source,
+  favorites,
+  current,
+  currentIsFavorite,
+  onSaveFavorite,
+  onSelectFavorite,
+  onRemoveFavorite,
 }: LocationInputProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<City[]>([]);
@@ -60,6 +76,64 @@ export function LocationInput({
 
   return (
     <div className="flex w-full flex-col gap-3">
+      {(favorites.length > 0 || current) && (
+        <div className="rounded-xl border border-hairline p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted">
+              Favorit
+            </span>
+            {current && !currentIsFavorite && (
+              <button
+                type="button"
+                onClick={onSaveFavorite}
+                className="rounded-full border border-brass px-2.5 py-0.5 text-[0.7rem] font-semibold text-brass transition hover:bg-brass/10"
+              >
+                <span aria-hidden>★</span> Simpan lokasi ini
+              </button>
+            )}
+          </div>
+          {favorites.length > 0 ? (
+            <ul className="flex flex-wrap gap-2">
+              {favorites.map((fav) => {
+                const active =
+                  current !== null &&
+                  current.lat.toFixed(4) === fav.lat.toFixed(4) &&
+                  current.lng.toFixed(4) === fav.lng.toFixed(4);
+                return (
+                  <li
+                    key={fav.id}
+                    className={`flex items-center overflow-hidden rounded-full border ${
+                      active ? "border-brass bg-brass/10" : "border-hairline"
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => onSelectFavorite(fav)}
+                      aria-pressed={active}
+                      className="max-w-40 truncate px-3 py-1 text-xs font-medium text-foreground transition hover:bg-brass/10"
+                    >
+                      {fav.label}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onRemoveFavorite(fav.id)}
+                      aria-label={`Hapus favorit ${fav.label}`}
+                      className="px-2 py-1 text-muted transition hover:text-danger-text"
+                    >
+                      <span aria-hidden>×</span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-xs text-muted">
+              Belum ada. Simpan lokasi aktif untuk akses cepat.
+            </p>
+          )}
+        </div>
+      )}
+
       <div
         className={`rounded-xl border p-3 transition-colors ${
           gpsMode ? "border-brass bg-brass/5" : "border-hairline"

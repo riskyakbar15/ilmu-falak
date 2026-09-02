@@ -13,12 +13,20 @@ import { qiblaAzimuth, haversineDistance } from "@/lib/qibla";
 import { magneticDeclination } from "@/lib/declination";
 import { compassRotation, turnInstruction } from "@/lib/compass";
 import { loadStoredLocation, saveStoredLocation } from "@/lib/storage";
+import {
+  loadFavorites,
+  addFavorite,
+  removeFavorite,
+  isFavorite,
+  type FavoriteLocation,
+} from "@/lib/favorites";
 
 export function QiblaClient() {
   const geo = useGeolocation();
   const orientation = useDeviceOrientation();
   const [label, setLabel] = useState<string | null>(null);
   const [source, setSource] = useState<"gps" | "manual" | null>(null);
+  const [favorites, setFavorites] = useState<FavoriteLocation[]>([]);
   const lastSaved = useRef<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +38,7 @@ export function QiblaClient() {
       setLabel(stored.label ?? null);
       setSource(stored.label ? "manual" : "gps");
     }
+    setFavorites(loadFavorites());
     // Hanya sekali saat mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -78,6 +87,31 @@ export function QiblaClient() {
     setLabel(null);
     setSource("gps");
     geo.request();
+  }
+
+  const currentLabel =
+    position &&
+    (label ?? `${position.lat.toFixed(4)}, ${position.lng.toFixed(4)}`);
+  const current = position
+    ? { lat: position.lat, lng: position.lng, label: currentLabel as string }
+    : null;
+  const currentIsFavorite =
+    position !== null && isFavorite(favorites, position.lat, position.lng);
+
+  function handleSaveFavorite() {
+    if (!current) return;
+    setFavorites((prev) => addFavorite(prev, current));
+  }
+
+  function handleSelectFavorite(fav: FavoriteLocation) {
+    geo.setManual(fav.lat, fav.lng);
+    setLabel(fav.label);
+    setSource("manual");
+    saveStoredLocation({ lat: fav.lat, lng: fav.lng, label: fav.label });
+  }
+
+  function handleRemoveFavorite(id: string) {
+    setFavorites((prev) => removeFavorite(prev, id));
   }
 
   useEffect(() => {
@@ -189,6 +223,12 @@ export function QiblaClient() {
         status={geo.status}
         error={geo.error}
         source={source}
+        favorites={favorites}
+        current={current}
+        currentIsFavorite={currentIsFavorite}
+        onSaveFavorite={handleSaveFavorite}
+        onSelectFavorite={handleSelectFavorite}
+        onRemoveFavorite={handleRemoveFavorite}
       />
 
       <RashdulQibla />
